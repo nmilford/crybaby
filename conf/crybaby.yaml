@@ -1,0 +1,6 @@
+# Config file for Crybaby.
+crybaby.port: 8888
+cassandra.server: localhost
+cassandra.cluster: sputnik
+cassandra.keyspace: crybaby
+cassandra.columnfamily: events
