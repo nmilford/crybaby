@@ -1,37 +1,36 @@
 (ns crybaby.core
-  (:require [clojure.contrib.sql :as sql])
+  (:use [clj-hector.core])
+  (:use [clj-hector.ddl])
   (:use noir.core)
-  (:require [noir.server :as server]))
+  (:require [noir.server :as server])
+  (:require [noir.response :as response]))
 
-(def testdata
-  {:date "1345687531",
-   :body "tomcat6 restarted by nathan"})
+; Cassandra settings.
+(def my-cluster (cluster "sputnik" "localhost"))
+(def my-ks (keyspace my-cluster "crybaby"))
+(def my-cf "events")
 
-(def db-specs
-  {:classname   "org.sqlite.JDBC"
-   :subprotocol "sqlite"
-   :subname     "db/crybaby.db"})
+(defn gen-event-id []
+  "Generates a unix timestamp with milliseconds. Currently this is our event ID.
+   I want to keep the event ID and timestamp seperate in case they diverge."
+  (System/currentTimeMillis))
 
-(defn init-db []
-  (sql/with-connection db-specs
-  (sql/create-table :events
-              [:date :text]
-              [:body :text])))
+(defn gen-unix-timestamp []
+  "Generates a unix timestamp without milliseconds."
+  (int (/ (System/currentTimeMillis) 1000)))
 
-(init-db)
+(defn write-event [desc]
+  "Takes an event description, generates an ID andtimestamp and writes it to
+   Cassandra"
+  (def row-key (gen-event-id))
+  (def ts (gen-unix-timestamp))
+  (put my-ks my-cf row-key {"ts" ts, "desc" desc}))
+  
+(defpage "/" [] "curl -X POST 'http://localhost:8080/event?desc=your+event+description+here'")
 
-(sql/with-connection db-specs
-  (sql/insert-records :events testdata))
+(defpage [:post "/event"] {:keys [desc]}
+  (write-event desc)
+  (str "shit got real: " desc))
 
-(def output
-  (sql/with-connection db-specs
-    (sql/with-query-results rs ["select * from events"] (doall rs))))
-
-(keys (first output))
-
-;(defpage [:get "/"] [] (keys (first output))
-
-;(defpage [:post "/api/v1/post"] {:keys [event timestamp]}
-;  (str event " occured at " timestamp))
-
-;(server/start 8080)
+(defn -main [& args]
+   (server/start 8080))
