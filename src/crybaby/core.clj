@@ -1,23 +1,14 @@
 (ns crybaby.core
+  (:use [crybaby.util])
   (:use [clj-hector.core])
   (:use [clj-hector.ddl])
   (:use noir.core)
-  (:require [noir.server :as server])
-  (:require [noir.response :as response]))
+  (:require [noir.server :as server]))
 
 ; Cassandra settings.
 (def my-cluster (cluster "sputnik" "localhost"))
 (def my-ks (keyspace my-cluster "crybaby"))
 (def my-cf "events")
-
-(defn gen-event-id []
-  "Generates a unix timestamp with milliseconds. Currently this is our event ID.
-   I want to keep the event ID and timestamp seperate in case they diverge."
-  (System/currentTimeMillis))
-
-(defn gen-unix-timestamp []
-  "Generates a unix timestamp without milliseconds."
-  (int (/ (System/currentTimeMillis) 1000)))
 
 (defn write-event [desc]
   "Takes an event description, generates an ID andtimestamp and writes it to
@@ -33,4 +24,4 @@
   (str "shit got real: " desc))
 
 (defn -main [& args]
-   (server/start 8080))
+  (server/start 8080))
