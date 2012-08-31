@@ -14,10 +14,4 @@
   "Generates a unix timestamp without milliseconds."
   (int (/ (System/currentTimeMillis) 1000)))
 
-(defn write-event [desc]
-  "Takes an event description, generates an ID and timestamp and writes it to
-   Cassandra."
-  (def row-key (gen-event-id))
-  (def ts (gen-unix-timestamp)))
-  ;(info "New Event" row-key desc))
-  ;(put my-ks my-cf row-key {"ts" ts, "desc" desc})
+
