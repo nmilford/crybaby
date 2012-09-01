@@ -19,7 +19,5 @@
   :omit-source true
   :jar-exclusions [#"(?:^|/).git/"]
   :daemon {:crybaby {:ns crybaby.core
-                     :pidfile "run/crybaby.pid"}}
+                     :pidfile "crybaby.pid"}}
   :main crybaby.core)
-
-

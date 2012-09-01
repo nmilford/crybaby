@@ -1,9 +1,7 @@
 (ns crybaby.util
   (:use [crybaby.config])
   (:use [clj-logging-config.log4j])
-  (:use [clojure.tools.logging])
-  (:use [clj-hector.core])
-  (:use [clj-hector.ddl]))
+  (:use [clojure.tools.logging]))
 
 (defn gen-event-id []
   "Generates a unix timestamp with milliseconds. Currently this is our event ID.
